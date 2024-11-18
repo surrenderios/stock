@@ -49,6 +49,75 @@ def check_database():
             db.execute(" select 1 ")
 
 
+# ALERT table中的 utf8mb3_uca1400_ai_ci为 utf8mb3_general_ci
+def alert_table():
+    alert_sql = [
+        "ALTER TABLE `cn_stock_spot` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_spot` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_spot` MODIFY COLUMN `industry` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_etf_spot` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_etf_spot` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_selection` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_selection` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_selection` MODIFY COLUMN `industry` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_selection` MODIFY COLUMN `area` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_selection` MODIFY COLUMN `concept` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_selection` MODIFY COLUMN `style` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_selection` MODIFY COLUMN `is_hs300` varchar(2) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_selection` MODIFY COLUMN `is_sz50` varchar(2) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_selection` MODIFY COLUMN `is_zz500` varchar(2) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_selection` MODIFY COLUMN `is_zz1000` varchar(2) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_selection` MODIFY COLUMN `is_cy50` varchar(2) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_selection` MODIFY COLUMN `predict_type` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_selection` MODIFY COLUMN `org_rating` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_selection` MODIFY COLUMN `secucode` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_top` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_top` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_spot_buy` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_spot_buy` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_spot_buy` MODIFY COLUMN `industry` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_bonus` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_bonus` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_bonus` MODIFY COLUMN `progress` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_fund_flow` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_fund_flow` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_fund_flow_industry` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_fund_flow_industry` MODIFY COLUMN `stock_name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_fund_flow_industry` MODIFY COLUMN `stock_name_5` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_fund_flow_industry` MODIFY COLUMN `stock_name_10` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_fund_flow_concept` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_fund_flow_concept` MODIFY COLUMN `stock_name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_fund_flow_concept` MODIFY COLUMN `stock_name_5` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_fund_flow_concept` MODIFY COLUMN `stock_name_10` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_strategy_keep_increasing` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_strategy_keep_increasing` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_strategy_backtrace_ma250` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_strategy_backtrace_ma250` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_strategy_breakthrough_platform` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_strategy_breakthrough_platform` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_strategy_turtle_trade` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_strategy_turtle_trade` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_strategy_parking_apron` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_strategy_parking_apron` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_pattern` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_pattern` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_strategy_enter` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_strategy_enter` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_indicators` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_indicators` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_indicators_buy` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_indicators_buy` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_strategy_high_tight_flag` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_strategy_high_tight_flag` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_blocktrade` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+        "ALTER TABLE `cn_stock_blocktrade` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
+    ]
+    with pymysql.connect(**mdb.MYSQL_CONN_DBAPI) as conn:
+        with conn.cursor() as db:
+            for sql in alert_sql:
+                logging.info(f"exec:{sql}")
+                db.execute(sql)
+
 def main():
     # 检查，如果执行 select 1 失败，说明数据库不存在，然后创建一个新的数据库。
     try:
@@ -57,7 +126,8 @@ def main():
         logging.error("执行信息：数据库不存在，将创建。")
         # 检查数据库失败，
         create_new_database()
-    # 执行数据初始化。
+    # 修复表结构
+    # alert_table()
 
 
 # main函数入口

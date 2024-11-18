@@ -4,6 +4,7 @@
 import pandas as pd
 import requests
 import instock.core.tablestructure as tbs
+import logging
 
 __author__ = 'myh '
 __date__ = '2023/5/9 '
@@ -29,6 +30,8 @@ def stock_selection() -> pd.DataFrame:
         "source": "SELECT_SECURITIES",
         "client": "WEB"
     }
+    logging.info(f"stock_selection params:{params}")
+    
     r = requests.get(url, params=params)
     data_json = r.json()
     data = data_json["result"]["data"]

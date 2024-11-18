@@ -20,11 +20,13 @@ __date__ = '2023/5/5 '
 
 
 def save_nph_stock_selection_data(date, before=True):
+    logging.info(f"save_nph_stock_selection_data:{before}")
     if before:
         return
 
     try:
         data = stf.fetch_stock_selection()
+        logging.info(f"data:{data}")
         if data is None:
             return
 
@@ -32,6 +34,7 @@ def save_nph_stock_selection_data(date, before=True):
         # 删除老数据。
         if mdb.checkTableIsExist(table_name):
             _date = data.iloc[0]['date']
+            logging.info(f"_date:{_date}")
             del_sql = f"DELETE FROM `{table_name}` where `date` = '{_date}'"
             mdb.executeSql(del_sql)
             cols_type = None
