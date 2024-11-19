@@ -27,6 +27,7 @@ import strategy_data_daily_job as sdj
 import backtest_data_daily_job as bdj
 import klinepattern_data_daily_job as kdj
 import selection_data_daily_job as sddj
+import strategy_merge_job as mergejb
 
 __author__ = 'myh '
 __date__ = '2023/3/10 '
@@ -54,6 +55,9 @@ def main():
 
     # # # # 第6步创建股票回测
     bdj.main()
+
+    # 合并筛选
+    mergejb.main()
 
     # # # # 第7步创建股票闭盘后才有的数据
     acdj.main()
