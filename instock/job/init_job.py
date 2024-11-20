@@ -51,6 +51,7 @@ def check_database():
 
 # ALERT table中的 utf8mb3_uca1400_ai_ci为 utf8mb3_general_ci
 def alert_table():
+    # TODO只执行一次
     alert_sql = [
         "ALTER TABLE `cn_stock_spot` MODIFY COLUMN `code` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
         "ALTER TABLE `cn_stock_spot` MODIFY COLUMN `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci",
@@ -127,7 +128,7 @@ def main():
         # 检查数据库失败，
         create_new_database()
     # 修复表结构
-    # alert_table()
+    alert_table()
 
 
 # main函数入口
