@@ -6,11 +6,12 @@ rm -rf cron
 cp -r ../../stock/cron .
 
 DOCKER_NAME=mayanghua/instock
-TAG1=$(date "+%Y%m")
+# TAG1=$(date "+%Y%m")
 TAG2=latest
 
 echo " docker build -f Dockerfile -t ${DOCKER_NAME} ."
-docker build -f Dockerfile -t ${DOCKER_NAME}:${TAG1} -t ${DOCKER_NAME}:${TAG2} .
+# docker build -f Dockerfile -t ${DOCKER_NAME}:${TAG1} -t ${DOCKER_NAME}:${TAG2} .
+docker build -f Dockerfile -t ${DOCKER_NAME}:${TAG1} .
 echo "#################################################################"
 echo " docker push ${DOCKER_NAME} "
 
