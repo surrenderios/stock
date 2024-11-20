@@ -242,6 +242,7 @@ def stock_lhb_jgmmtj_em(
     }
     r = requests.get(url, params=params)
     data_json = r.json()
+    
     temp_df = pd.DataFrame(data_json["result"]["data"])
     temp_df.reset_index(inplace=True)
     temp_df["index"] = temp_df.index + 1

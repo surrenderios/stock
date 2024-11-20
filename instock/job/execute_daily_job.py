@@ -38,28 +38,38 @@ def main():
     _start = datetime.datetime.now()
     logging.info("######## 任务执行时间: %s #######" % _start.strftime("%Y-%m-%d %H:%M:%S.%f"))
     # 第1步创建数据库
+    logging.info("######## 第1步创建数据库 #######")
     bj.main()
+    logging.info("######## 第2.1步创建股票基础数据表 #######")
     # 第2.1步创建股票基础数据表
     hdj.main()
+    logging.info("######## 第2.2步创建综合股票数据表 #######")
     # 第2.2步创建综合股票数据表
     sddj.main()
+
     with concurrent.futures.ThreadPoolExecutor() as executor:
         # # 第3.1步创建股票其它基础数据表
+        logging.info("######## 第3.1步创建股票其它基础数据表 #######")
         executor.submit(hdtj.main)
         # # 第3.2步创建股票指标数据表
+        logging.info("######## 第3.2步创建股票指标数据表 #######")
         executor.submit(gdj.main)
         # # # # 第4步创建股票k线形态表
+        logging.info("######## 第4步创建股票k线形态表 #######")
         executor.submit(kdj.main)
         # # # # 第5步创建股票策略数据表
+        logging.info("######## 第5步创建股票策略数据表 #######")
         executor.submit(sdj.main)
-
-    # # # # 第6步创建股票回测
-    bdj.main()
 
     # 合并筛选
     mergejb.main()
 
+    # # # # 第6步创建股票回测
+    logging.info("######## 第6步创建股票回测 #######")
+    bdj.main()
+
     # # # # 第7步创建股票闭盘后才有的数据
+    logging.info("######## 第7步创建股票闭盘后才有的数据 #######")
     acdj.main()
 
     logging.info("######## 完成任务, 使用时间: %s 秒 #######" % (time.time() - start))

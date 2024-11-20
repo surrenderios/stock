@@ -167,6 +167,7 @@ def fetch_stocks_bonus(date):
 
 # 股票近三月上龙虎榜且必须有2次以上机构参与的
 def fetch_stock_top_entity_data(date):
+    logging.info(f"stockfetch.fetch_stock_top_entity_data处理日期：{date}")
     run_date = date + datetime.timedelta(days=-90)
     start_date = run_date.strftime("%Y%m%d")
     end_date = date.strftime("%Y%m%d")
@@ -174,6 +175,7 @@ def fetch_stock_top_entity_data(date):
     entity_amount_name = '买方机构数'
     try:
         data = sle.stock_lhb_jgmmtj_em(start_date, end_date)
+        logging.info(f"stockfetch.fetch_stock_top_entity_data处理数据：{data}")
         if data is None or len(data.index) == 0:
             return None
 

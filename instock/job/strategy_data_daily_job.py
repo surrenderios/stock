@@ -26,8 +26,10 @@ def prepare(date, strategy):
         if stocks_data is None:
             return
         table_name = strategy['name']
+        logging.info(f"table_name:{table_name} date:{date}")
         strategy_func = strategy['func']
         results = run_check(strategy_func, table_name, stocks_data, date)
+        logging.info(f"results:{results} date:{date}")
         if results is None:
             return
 
@@ -55,12 +57,17 @@ def prepare(date, strategy):
 
 
 def run_check(strategy_fun, table_name, stocks, date, workers=40):
+    logging.info(f"strategy_fun:{strategy_fun}")
     is_check_high_tight = False
     if strategy_fun.__name__ == 'check_high_tight':
         stock_tops = fetch_stock_top_entity_data(date)
+        logging.info(f"stock_tops:{stock_tops}")
         if stock_tops is not None:
             is_check_high_tight = True
     data = []
+
+    # 将 stocks 只保留第一个元素
+    # stocks = {list(stocks.keys())[0]: list(stocks.values())[0]}
     try:
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
             if is_check_high_tight:
