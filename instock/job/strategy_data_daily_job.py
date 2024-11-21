@@ -26,10 +26,8 @@ def prepare(date, strategy):
         if stocks_data is None:
             return
         table_name = strategy['name']
-        logging.info(f"table_name:{table_name} date:{date}")
         strategy_func = strategy['func']
         results = run_check(strategy_func, table_name, stocks_data, date)
-        logging.info(f"results:{results} date:{date}")
         if results is None:
             return
 
