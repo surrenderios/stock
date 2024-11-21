@@ -70,15 +70,12 @@ def repeat_stock_code(repeat_dict: dict,repeat_name_dict:dict,  items: list):
             repeat_name_dict[code] = name
 
 
-def main():
-
+def merge_strategy_data(date: str):
+    
     # 使用一个字典, 通过 code 记录分别在下面数据中出现的次数
     repeat_dict = {}
     repeat_name_dict = {}
 
-    
-
-    date = "2024-11-19"
     # 基本面选股数据
     #     [
     #     {
@@ -179,6 +176,10 @@ def main():
     # 打印出code,name,出现次数
     for k,v in repeat_dict.items():
         logging.info(f"{k},{repeat_name_dict[k]},{v}")
+
+def main():
+    runt.run_with_args(merge_strategy_data)
+
 
 # main函数入口
 if __name__ == '__main__':
