@@ -40,7 +40,9 @@ if not os.path.exists(stock_hist_cache_path):
 # 430、83、87开头的股票是北证A股
 def is_a_stock(code):
     # 上证A股  # 深证A股
-    return code.startswith(('600', '601', '603', '605', '000', '001', '002', '003', '300', '301'))
+    # 不要创业板和三板市场股票
+    # return code.startswith(('600', '601', '603', '605', '000', '001', '002', '003', '300', '301'))
+    return code.startswith(('600', '601', '603', '605', '000', '001', '002', '003'))
 
 
 # 过滤掉 st 股票。
