@@ -72,9 +72,9 @@ def main():
         future_3_2 = executor.submit(gdj.main)
 
         # 第4步：创建股票k线形态表
-        step_start_4 = time.time()
-        logging.info("######## 开始第4步：创建股票k线形态表 #######")
-        future_4 = executor.submit(kdj.main)
+        # step_start_4 = time.time()
+        # logging.info("######## 开始第4步：创建股票k线形态表 #######")
+        # future_4 = executor.submit(kdj.main)
 
         # 第5步：创建股票策略数据表
         step_start_5 = time.time()
@@ -88,8 +88,8 @@ def main():
         future_3_2.result()
         print_step_info("第3.2步：创建股票指标数据表", step_start_3_2)
         
-        future_4.result()
-        print_step_info("第4步：创建股票k线形态表", step_start_4)
+        # future_4.result()
+        # print_step_info("第4步：创建股票k线形态表", step_start_4)
         
         future_5.result()
         print_step_info("第5步：创建股票策略数据表", step_start_5)
