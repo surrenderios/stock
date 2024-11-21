@@ -61,13 +61,10 @@ def run_check(strategy_fun, table_name, stocks, date, workers=40):
     is_check_high_tight = False
     if strategy_fun.__name__ == 'check_high_tight':
         stock_tops = fetch_stock_top_entity_data(date)
-        logging.info(f"stock_tops:{stock_tops}")
         if stock_tops is not None:
             is_check_high_tight = True
     data = []
 
-    # 将 stocks 只保留第一个元素
-    # stocks = {list(stocks.keys())[0]: list(stocks.values())[0]}
     try:
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
             if is_check_high_tight:
