@@ -41,7 +41,10 @@ def create_new_base_table():
                                   INDEX `INIX_DATETIME`(`datetime`) USING BTREE
                                   ) CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;"""
             db.execute(create_table_sql)
-            
+
+def create_system_init_status():
+    with pymysql.connect(**mdb.MYSQL_CONN_DBAPI) as conn:
+        with conn.cursor() as db:
             # Add new initialization tracking table
             init_table_sql = """CREATE TABLE IF NOT EXISTS `system_init_status` (
                               `key` varchar(50) NOT NULL,
@@ -52,6 +55,7 @@ def create_new_base_table():
             db.execute(init_table_sql)
 
 
+
 def check_database():
     with pymysql.connect(**mdb.MYSQL_CONN_DBAPI) as conn:
         with conn.cursor() as db:
@@ -60,6 +64,7 @@ def check_database():
 
 # ALERT table中的 utf8mb3_uca1400_ai_ci为 utf8mb3_general_ci
 def alert_table():
+    create_system_init_status()
     with pymysql.connect(**mdb.MYSQL_CONN_DBAPI) as conn:
         with conn.cursor() as db:
             # Check if already executed
