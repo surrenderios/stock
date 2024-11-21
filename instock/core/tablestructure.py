@@ -376,18 +376,18 @@ TABLE_CN_STOCK_STRATEGIES = [
     {'name': 'cn_stock_strategy_breakthrough_platform', 'cn': '突破平台', 'size': 70,
      'func': breakthrough_platform.check,
      'columns': _tmp_columns},
-    {'name': 'cn_stock_strategy_low_backtrace_increase', 'cn': '无大幅回撤', 'size': 70,
-     'func': low_backtrace_increase.check,
-     'columns': _tmp_columns},
+    # {'name': 'cn_stock_strategy_low_backtrace_increase', 'cn': '无大幅回撤', 'size': 70,
+    #  'func': low_backtrace_increase.check,
+    #  'columns': _tmp_columns},
     {'name': 'cn_stock_strategy_turtle_trade', 'cn': '海龟交易法则', 'size': 70, 'func': turtle_trade.check_enter,
      'columns': _tmp_columns},
     {'name': 'cn_stock_strategy_high_tight_flag', 'cn': '高而窄的旗形', 'size': 70,
      'func': high_tight_flag.check_high_tight,
      'columns': _tmp_columns},
-    {'name': 'cn_stock_strategy_climax_limitdown', 'cn': '放量跌停', 'size': 70, 'func': climax_limitdown.check,
-     'columns': _tmp_columns},
-    {'name': 'cn_stock_strategy_low_atr', 'cn': '低ATR成长', 'size': 70, 'func': low_atr.check_low_increase,
-     'columns': _tmp_columns}
+    # {'name': 'cn_stock_strategy_climax_limitdown', 'cn': '放量跌停', 'size': 70, 'func': climax_limitdown.check,
+    #  'columns': _tmp_columns},
+    # {'name': 'cn_stock_strategy_low_atr', 'cn': '低ATR成长', 'size': 70, 'func': low_atr.check_low_increase,
+    #  'columns': _tmp_columns}
 ]
 
 STOCK_KLINE_PATTERN_DATA = {'name': 'cn_stock_pattern_recognitions', 'cn': 'K线形态',
