@@ -225,8 +225,9 @@ def stock_spot_buy(date):
 
 
 def main():
-    runt.run_with_args(save_nph_stock_top_data)
-    runt.run_with_args(save_nph_stock_bonus)
+    # runt.run_with_args(save_nph_stock_top_data)
+    # runt.run_with_args(save_nph_stock_bonus)
+    # 暂时不需要上面2个数据
     runt.run_with_args(save_nph_stock_fund_flow_data)
     runt.run_with_args(save_nph_stock_sector_fund_flow_data)
 
