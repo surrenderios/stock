@@ -157,7 +157,7 @@ def main():
         # 检查数据库失败，
         create_new_database()
     # 修复表结构
-    alert_table()
+    # alert_table()
 
 
 # main函数入口

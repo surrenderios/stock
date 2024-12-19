@@ -43,7 +43,7 @@ trusted-host = mirrors.aliyun.com" > /etc/pip.conf && \
     pip install easytrader && \
     curl -SL https://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz | tar -xzC . && \
     cd ta-lib/  && \
-    ./configure --build=arm-linux --prefix=/usr && \
+    ./configure --prefix=/usr && \
     make && \
     make install && \
     cd .. && \

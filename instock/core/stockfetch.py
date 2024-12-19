@@ -58,6 +58,11 @@ def is_open(price):
 def is_open_with_line(price):
     return price != '-'
 
+# 过滤掉市值小于100亿的股票 total_market_cap
+def is_market_cap_gt_10000000000(total_market_cap):
+    return total_market_cap > 10000000000
+
+
 
 # 读取股票交易日历数据
 def fetch_stocks_trade_date():
@@ -101,13 +106,20 @@ def fetch_stocks(date):
         else:
             data.insert(0, 'date', date.strftime("%Y-%m-%d"))
         data.columns = list(tbs.TABLE_CN_STOCK_SPOT['columns'])
-        # data = data.loc[data['code'].apply(is_a_stock)].loc[data['new_price'].apply(is_open)]
         # 过滤掉非股票
         data = data.loc[data['code'].apply(is_a_stock)]
-        # 过滤掉退市
+        logging.info(f"当前股票数量 1: {len(data.index)}")
+        # 过滤掉退市 # 过滤掉没有股价的
         data = data.loc[data['new_price'].apply(is_open)]
+        data = data.loc[data['new_price'].apply(is_open_with_line)]
+        logging.info(f"当前股票数量 2: {len(data.index)}")
         # 过滤掉ST
         data = data.loc[data['name'].apply(is_not_st)]
+        logging.info(f"当前股票数量 3: {len(data.index)}")
+        # 过滤掉市值小于50亿的股票
+        data = data.loc[data['total_market_cap'].apply(is_market_cap_gt_10000000000)]
+        logging.info(f"当前股票数量 4: {len(data.index)}")
+
         return data
     except Exception as e:
         logging.error(f"stockfetch.fetch_stocks处理异常：{e}")

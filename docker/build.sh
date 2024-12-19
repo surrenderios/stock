@@ -11,7 +11,7 @@ TAG1=$(date "+%Y%m")
 
 echo " docker build -f Dockerfile -t ${DOCKER_NAME} ."
 # docker build -f Dockerfile -t ${DOCKER_NAME}:${TAG1} -t ${DOCKER_NAME}:${TAG2} .
-docker build -f Dockerfile -t ${DOCKER_NAME}:${TAG1} .
+docker build --platform linux/amd64 -f Dockerfile -t ${DOCKER_NAME}:${TAG1} .
 echo "#################################################################"
 echo " docker push ${DOCKER_NAME} "
 
