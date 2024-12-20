@@ -24,7 +24,7 @@ import basic_data_after_close_daily_job as acdj
 import indicators_data_daily_job as gdj
 import strategy_data_daily_job as sdj
 import backtest_data_daily_job as bdj
-import klinepattern_data_daily_job as kdj
+# import klinepattern_data_daily_job as kdj
 import selection_data_daily_job as sddj
 import strategy_merge_job as mergejb
 
