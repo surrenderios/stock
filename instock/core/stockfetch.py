@@ -52,11 +52,13 @@ def is_not_st(name):
 
 # 过滤价格，如果没有基本上是退市了。
 def is_open(price):
-    return not np.isnan(price)
+    if isinstance(price, str):
+        return price != '-'
+    try:
+        return not (np.isnan(price) or price == 0)
+    except:
+        return False
 
-
-def is_open_with_line(price):
-    return price != '-'
 
 # 过滤掉市值小于100亿的股票 total_market_cap
 def is_market_cap_gt_10000000000(total_market_cap):
@@ -122,13 +124,16 @@ def filter_stock_data(data, filters=None):
             data = data.loc[data['code'].apply(is_a_stock)]
             
         if filters.get('filter_price') and 'new_price' in data.columns:
+            # Convert price column to numeric, coercing errors to NaN
+            data['new_price'] = pd.to_numeric(data['new_price'], errors='coerce')
             data = data.loc[data['new_price'].apply(is_open)]
-            data = data.loc[data['new_price'].apply(is_open_with_line)]
             
         if filters.get('filter_st') and 'name' in data.columns:
             data = data.loc[data['name'].apply(is_not_st)]
             
         if filters.get('filter_market_cap') and 'total_market_cap' in data.columns:
+            # Convert market cap to numeric, coercing errors to NaN
+            data['total_market_cap'] = pd.to_numeric(data['total_market_cap'], errors='coerce')
             data = data.loc[data['total_market_cap'].apply(is_market_cap_gt_10000000000)]
             
         return data
