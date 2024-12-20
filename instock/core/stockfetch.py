@@ -95,31 +95,66 @@ def fetch_etfs(date):
     return None
 
 
+def filter_stock_data(data, filters=None):
+    """
+    统一的股票数据过滤方法
+    :param data: DataFrame 需要过滤的数据
+    :param filters: dict 过滤条件字典，可选的过滤条件包括：
+        - filter_a_stock: 是否过滤A股
+        - filter_st: 是否过滤ST股票
+        - filter_price: 是否过滤无效价格
+        - filter_market_cap: 是否过滤市值
+    :return: 过滤后的DataFrame
+    """
+    if data is None or len(data.index) == 0:
+        return None
+        
+    if filters is None:
+        filters = {
+            'filter_a_stock': True,
+            'filter_st': True,
+            'filter_price': True,
+            'filter_market_cap': True
+        }
+
+    try:
+        if filters.get('filter_a_stock') and 'code' in data.columns:
+            data = data.loc[data['code'].apply(is_a_stock)]
+            
+        if filters.get('filter_price') and 'new_price' in data.columns:
+            data = data.loc[data['new_price'].apply(is_open)]
+            data = data.loc[data['new_price'].apply(is_open_with_line)]
+            
+        if filters.get('filter_st') and 'name' in data.columns:
+            data = data.loc[data['name'].apply(is_not_st)]
+            
+        if filters.get('filter_market_cap') and 'total_market_cap' in data.columns:
+            data = data.loc[data['total_market_cap'].apply(is_market_cap_gt_10000000000)]
+            
+        return data
+    except Exception as e:
+        logging.error(f"filter_stock_data处理异常：{e}")
+        return None
+
 # 读取当天股票数据
 def fetch_stocks(date):
     try:
         data = she.stock_zh_a_spot_em()
         if data is None or len(data.index) == 0:
             return None
+            
         if date is None:
             data.insert(0, 'date', datetime.datetime.now().strftime("%Y-%m-%d"))
         else:
             data.insert(0, 'date', date.strftime("%Y-%m-%d"))
+            
         data.columns = list(tbs.TABLE_CN_STOCK_SPOT['columns'])
-        # 过滤掉非股票
-        data = data.loc[data['code'].apply(is_a_stock)]
-        logging.info(f"当前股票数量 1: {len(data.index)}")
-        # 过滤掉退市 # 过滤掉没有股价的
-        data = data.loc[data['new_price'].apply(is_open)]
-        data = data.loc[data['new_price'].apply(is_open_with_line)]
-        logging.info(f"当前股票数量 2: {len(data.index)}")
-        # 过滤掉ST
-        data = data.loc[data['name'].apply(is_not_st)]
-        logging.info(f"当前股票数量 3: {len(data.index)}")
-        # 过滤掉市值小于50亿的股票
-        data = data.loc[data['total_market_cap'].apply(is_market_cap_gt_10000000000)]
-        logging.info(f"当前股票数量 4: {len(data.index)}")
-
+        
+        # 使用统一的过滤方法
+        data = filter_stock_data(data)
+        if data is not None:
+            logging.info(f"当前股票数量: {len(data.index)}")
+            
         return data
     except Exception as e:
         logging.error(f"stockfetch.fetch_stocks处理异常：{e}")
@@ -146,7 +181,15 @@ def fetch_stocks_fund_flow(index):
         if data is None or len(data.index) == 0:
             return None
         data.columns = list(cn_flow['columns'])
-        data = data.loc[data['code'].apply(is_a_stock)].loc[data['new_price'].apply(is_open_with_line)]
+        
+        # 使用统一的过滤方法，只过滤A股和价格
+        filters = {
+            'filter_a_stock': True,
+            'filter_st': True,
+            'filter_price': True,
+            'filter_market_cap': True
+        }
+        data = filter_stock_data(data, filters)
         return data
     except Exception as e:
         logging.error(f"stockfetch.fetch_stocks_fund_flow处理异常：{e}")
@@ -178,7 +221,15 @@ def fetch_stocks_bonus(date):
         else:
             data.insert(0, 'date', date.strftime("%Y-%m-%d"))
         data.columns = list(tbs.TABLE_CN_STOCK_BONUS['columns'])
-        data = data.loc[data['code'].apply(is_a_stock)]
+        
+        # 使用统一的过滤方法，只过滤A股
+        filters = {
+            'filter_a_stock': True,
+            'filter_st': True,
+            'filter_price': True,
+            'filter_market_cap': True
+        }
+        data = filter_stock_data(data, filters)
         return data
     except Exception as e:
         logging.error(f"stockfetch.fetch_stocks_bonus处理异常：{e}")
