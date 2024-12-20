@@ -173,9 +173,12 @@ def merge_strategy_data(date: str):
     # 将repeat_dict按照出现次数排序
     repeat_dict = dict(sorted(repeat_dict.items(), key=lambda x: x[1], reverse=True))
     # 打印出code,name,和出现次数大于2的
+    # for k,v in repeat_dict.items():
+    #     if v > 2:
+    #         logging.info(f"{k},{repeat_name_dict[k]},{v}")
+    #按照出现次数降序打印
     for k,v in repeat_dict.items():
-        if v > 2:
-            logging.info(f"{k},{repeat_name_dict[k]},{v}")
+        logging.info(f"{k},{repeat_name_dict[k]},{v}")
 
 def main():
     runt.run_with_args(merge_strategy_data)
