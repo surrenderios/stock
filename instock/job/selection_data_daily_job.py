@@ -25,7 +25,6 @@ def save_nph_stock_selection_data(date, before=True):
 
     try:
         data = stf.fetch_stock_selection()
-        logging.info(f"data:{data}")
         if data is None:
             return
 

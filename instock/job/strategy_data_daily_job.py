@@ -55,14 +55,12 @@ def prepare(date, strategy):
 
 
 def run_check(strategy_fun, table_name, stocks, date, workers=40):
-    logging.info(f"strategy_fun:{strategy_fun}")
     is_check_high_tight = False
     if strategy_fun.__name__ == 'check_high_tight':
         stock_tops = fetch_stock_top_entity_data(date)
         if stock_tops is not None:
             is_check_high_tight = True
     data = []
-
     try:
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
             if is_check_high_tight:

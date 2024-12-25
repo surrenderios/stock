@@ -59,6 +59,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
     r = requests.get(url, params=params)
     data_json = r.json()
     temp_df = pd.DataFrame(data_json["data"]["diff"])
+    temp_df = temp_df[~temp_df["f2"].isin(["-"])]
     if indicator == "今日":
         temp_df.columns = [
             "最新价",
@@ -215,6 +216,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
                 "10日小单净流入-净占比",
             ]
         ]
+        # temp_df['最新价'] = pd.to_numeric(temp_df['最新价'], errors="coerce").fillna(0)
     return temp_df
 
 
@@ -273,6 +275,7 @@ def stock_sector_fund_flow_rank(
     text_data = r.text
     json_data = json.loads(text_data[text_data.find("{") : -2])
     temp_df = pd.DataFrame(json_data["data"]["diff"])
+    temp_df = temp_df[~temp_df["f2"].isin(["-"])]
     if indicator == "今日":
         temp_df.columns = [
             "-",
@@ -390,6 +393,7 @@ def stock_sector_fund_flow_rank(
                 "10日主力净流入最大股",
             ]
         ]
+
     return temp_df
 
 

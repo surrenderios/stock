@@ -40,9 +40,7 @@ if not os.path.exists(stock_hist_cache_path):
 # 430、83、87开头的股票是北证A股
 def is_a_stock(code):
     # 上证A股  # 深证A股
-    # 不要创业板和三板市场股票
-    # return code.startswith(('600', '601', '603', '605', '000', '001', '002', '003', '300', '301'))
-    return code.startswith(('600', '601', '603', '605', '000', '001', '002', '003'))
+    return code.startswith(('600', '601', '603', '605', '000', '001', '002', '003', '300', '301'))
 
 
 # 过滤掉 st 股票。
@@ -52,18 +50,11 @@ def is_not_st(name):
 
 # 过滤价格，如果没有基本上是退市了。
 def is_open(price):
-    if isinstance(price, str):
-        return price != '-'
-    try:
-        return not (np.isnan(price) or price == 0)
-    except:
-        return False
+    return not np.isnan(price)
 
 
-# 过滤掉市值小于100亿的股票 total_market_cap
-def is_market_cap_gt_10000000000(total_market_cap):
-    return total_market_cap > 10000000000
-
+def is_open_with_line(price):
+    return price != '-'
 
 
 # 读取股票交易日历数据
@@ -97,69 +88,18 @@ def fetch_etfs(date):
     return None
 
 
-def filter_stock_data(data, filters=None):
-    """
-    统一的股票数据过滤方法
-    :param data: DataFrame 需要过滤的数据
-    :param filters: dict 过滤条件字典，可选的过滤条件包括：
-        - filter_a_stock: 是否过滤A股
-        - filter_st: 是否过滤ST股票
-        - filter_price: 是否过滤无效价格
-        - filter_market_cap: 是否过滤市值
-    :return: 过滤后的DataFrame
-    """
-    if data is None or len(data.index) == 0:
-        return None
-        
-    if filters is None:
-        filters = {
-            'filter_a_stock': True,
-            'filter_st': True,
-            'filter_price': True,
-            'filter_market_cap': True
-        }
-
-    try:
-        if filters.get('filter_a_stock') and 'code' in data.columns:
-            data = data.loc[data['code'].apply(is_a_stock)]
-            
-        if filters.get('filter_price') and 'new_price' in data.columns:
-            # Convert price column to numeric, coercing errors to NaN
-            data['new_price'] = pd.to_numeric(data['new_price'], errors='coerce')
-            data = data.loc[data['new_price'].apply(is_open)]
-            
-        if filters.get('filter_st') and 'name' in data.columns:
-            data = data.loc[data['name'].apply(is_not_st)]
-            
-        if filters.get('filter_market_cap') and 'total_market_cap' in data.columns:
-            # Convert market cap to numeric, coercing errors to NaN
-            data['total_market_cap'] = pd.to_numeric(data['total_market_cap'], errors='coerce')
-            data = data.loc[data['total_market_cap'].apply(is_market_cap_gt_10000000000)]
-            
-        return data
-    except Exception as e:
-        logging.error(f"filter_stock_data处理异常：{e}")
-        return None
-
 # 读取当天股票数据
 def fetch_stocks(date):
     try:
         data = she.stock_zh_a_spot_em()
         if data is None or len(data.index) == 0:
             return None
-            
         if date is None:
             data.insert(0, 'date', datetime.datetime.now().strftime("%Y-%m-%d"))
         else:
             data.insert(0, 'date', date.strftime("%Y-%m-%d"))
-            
         data.columns = list(tbs.TABLE_CN_STOCK_SPOT['columns'])
-        
-        # 使用统一的过滤方法
-        data = filter_stock_data(data)
-        if data is not None:
-            logging.info(f"当前股票数量: {len(data.index)}")
-            
+        data = data.loc[data['code'].apply(is_a_stock)].loc[data['new_price'].apply(is_open)]
         return data
     except Exception as e:
         logging.error(f"stockfetch.fetch_stocks处理异常：{e}")
@@ -172,6 +112,7 @@ def fetch_stock_selection():
         if data is None or len(data.index) == 0:
             return None
         data.columns = list(tbs.TABLE_CN_STOCK_SELECTION['columns'])
+        data.drop_duplicates('code', keep='last', inplace=True)
         return data
     except Exception as e:
         logging.error(f"stockfetch.fetch_stocks_selection处理异常：{e}")
@@ -186,15 +127,7 @@ def fetch_stocks_fund_flow(index):
         if data is None or len(data.index) == 0:
             return None
         data.columns = list(cn_flow['columns'])
-        
-        # 使用统一的过滤方法，只过滤A股和价格
-        filters = {
-            'filter_a_stock': True,
-            'filter_st': True,
-            'filter_price': True,
-            'filter_market_cap': True
-        }
-        data = filter_stock_data(data, filters)
+        data = data.loc[data['code'].apply(is_a_stock)].loc[data['new_price'].apply(is_open_with_line)]
         return data
     except Exception as e:
         logging.error(f"stockfetch.fetch_stocks_fund_flow处理异常：{e}")
@@ -226,15 +159,7 @@ def fetch_stocks_bonus(date):
         else:
             data.insert(0, 'date', date.strftime("%Y-%m-%d"))
         data.columns = list(tbs.TABLE_CN_STOCK_BONUS['columns'])
-        
-        # 使用统一的过滤方法，只过滤A股
-        filters = {
-            'filter_a_stock': True,
-            'filter_st': True,
-            'filter_price': True,
-            'filter_market_cap': True
-        }
-        data = filter_stock_data(data, filters)
+        data = data.loc[data['code'].apply(is_a_stock)]
         return data
     except Exception as e:
         logging.error(f"stockfetch.fetch_stocks_bonus处理异常：{e}")
@@ -276,7 +201,7 @@ def fetch_stock_top_entity_data(date):
 # 描述: 获取新浪财经-龙虎榜-个股上榜统计
 def fetch_stock_top_data(date):
     try:
-        data = sls.stock_lhb_ggtj_sina(recent_day="5")
+        data = sls.stock_lhb_ggtj_sina()
         if data is None or len(data.index) == 0:
             return None
         _columns = list(tbs.TABLE_CN_STOCK_TOP['columns'])
