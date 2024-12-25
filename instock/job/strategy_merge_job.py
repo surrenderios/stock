@@ -142,33 +142,33 @@ def merge_strategy_data(date: str):
     # # 均线多头数据
     # # 格式同上
 
-    # cn_stock_strategy_keep_increasing = fetch_api_data("cn_stock_strategy_keep_increasing",date)
-    # repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_keep_increasing.json())
+    cn_stock_strategy_keep_increasing = fetch_api_data("cn_stock_strategy_keep_increasing",date)
+    repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_keep_increasing.json())
 
     # # 停机坪数据
     # # 格式同上
-    # cn_stock_strategy_parking_apron = fetch_api_data("cn_stock_strategy_parking_apron",date)
-    # repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_parking_apron.json())
+    cn_stock_strategy_parking_apron = fetch_api_data("cn_stock_strategy_parking_apron",date)
+    repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_parking_apron.json())
 
     # # 回踩年线
     # # 格式同上
-    # cn_stock_strategy_backtrace_ma250 = fetch_api_data("cn_stock_strategy_backtrace_ma250",date)
-    # repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_backtrace_ma250.json())
+    cn_stock_strategy_backtrace_ma250 = fetch_api_data("cn_stock_strategy_backtrace_ma250",date)
+    repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_backtrace_ma250.json())
 
     # # 突破平台
     # # 格式同上
-    # cn_stock_strategy_breakthrough_platform = fetch_api_data("cn_stock_strategy_breakthrough_platform",date)
-    # repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_breakthrough_platform.json())
+    cn_stock_strategy_breakthrough_platform = fetch_api_data("cn_stock_strategy_breakthrough_platform",date)
+    repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_breakthrough_platform.json())
 
     # # 海龟交易法
     # # 格式同上
-    # cn_stock_strategy_turtle_trade = fetch_api_data("cn_stock_strategy_turtle_trade",date)
-    # repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_turtle_trade.json())
+    cn_stock_strategy_turtle_trade = fetch_api_data("cn_stock_strategy_turtle_trade",date)
+    repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_turtle_trade.json())
 
     # # 高而窄的旗形
     # # 格式同上
-    # cn_stock_strategy_high_tight_flag = fetch_api_data("cn_stock_strategy_high_tight_flag",date)
-    # repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_high_tight_flag.json())
+    cn_stock_strategy_high_tight_flag = fetch_api_data("cn_stock_strategy_high_tight_flag",date)
+    repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_high_tight_flag.json())
 
     # 将repeat_dict按照出现次数排序
     repeat_dict = dict(sorted(repeat_dict.items(), key=lambda x: x[1], reverse=True))
