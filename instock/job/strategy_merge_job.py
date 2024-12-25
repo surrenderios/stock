@@ -123,8 +123,8 @@ def merge_strategy_data(date: str):
     #         "cdatetime": null
     #     }
     # ]
-    cn_stock_spot_buy = fetch_api_data("cn_stock_spot_buy",date)
-    repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_spot_buy.json())
+    # cn_stock_spot_buy = fetch_api_data("cn_stock_spot_buy",date)
+    # repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_spot_buy.json())
 
     # names = [k["name"] for k in cn_stock_spot_buy.json()]
     # logging.info(f"names: {names}")
