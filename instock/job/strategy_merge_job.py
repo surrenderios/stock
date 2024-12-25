@@ -55,7 +55,6 @@ def fetch_api_data(name: str, date: str):
     }
 
     response = requests.get(url, headers=headers, params=params)
-    logging.info(f"response: {response.json()}")
     return response
 
 def repeat_stock_code(repeat_dict: dict,repeat_name_dict:dict,  items: list):
