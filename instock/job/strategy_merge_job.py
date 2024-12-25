@@ -57,128 +57,65 @@ def fetch_api_data(name: str, date: str):
     response = requests.get(url, headers=headers, params=params)
     return response
 
-def repeat_stock_code(repeat_dict: dict,repeat_name_dict:dict,  items: list):
+def repeat_stock_code(repeat_dict: dict, repeat_name_dict: dict, strategy_dict: dict, items: list, strategy_name: str):
     for k in items:
         code = k["code"]
         name = k["name"]
         if code in repeat_dict:
             repeat_dict[code] += 1
-            repeat_name_dict[code] = name
+            if code in strategy_dict:
+                strategy_dict[code].append(strategy_name)
         else:
             repeat_dict[code] = 1
             repeat_name_dict[code] = name
-
+            strategy_dict[code] = [strategy_name]
 
 def merge_strategy_data(date: str):
-    
-    # 使用一个字典, 通过 code 记录分别在下面数据中出现的次数
+    # 使用字典记录出现次数和策略名称
     repeat_dict = {}
     repeat_name_dict = {}
-
-    # 基本面选股数据
-    #     [
-    #     {
-    #         "date": "/OADate(45615.0)/",
-    #         "code": "301004",
-    #         "name": "嘉益股份",
-    #         "new_price": 104.73,
-    #         "change_rate": 5.56,
-    #         "ups_downs": 5.52,
-    #         "volume": 9140,
-    #         "deal_amount": 93561317,
-    #         "amplitude": 5.58,
-    #         "volume_ratio": 0.95,
-    #         "turnoverrate": 1.01,
-    #         "open_price": 99.34,
-    #         "high_price": 104.75,
-    #         "low_price": 99.21,
-    #         "pre_close_price": 99.21,
-    #         "speed_increase": 0.33,
-    #         "speed_increase_5": 0.41,
-    #         "speed_increase_60": 30.42,
-    #         "speed_increase_all": 141.04,
-    #         "dtsyl": 15.37,
-    #         "pe9": 15.78,
-    #         "pe": 23.05,
-    #         "pbnewmrq": 6.48,
-    #         "basic_eps": 5.11209,
-    #         "bvps": 16.1702,
-    #         "per_capital_reserve": 3.42832,
-    #         "per_unassign_profit": 11.1995,
-    #         "roe_weight": 35.92,
-    #         "sale_gpr": 39.5439,
-    #         "debt_asset_ratio": 26.274,
-    #         "total_operate_income": 1985164070,
-    #         "toi_yoy_ratio": 61.5969,
-    #         "parent_netprofit": 530988792,
-    #         "netprofit_yoy_ratio": 69.1999,
-    #         "report_date": "/OADate(45565.0)/",
-    #         "total_shares": 103869300,
-    #         "free_shares": 95931463,
-    #         "total_market_cap": 10878231789,
-    #         "free_cap": 10046902120,
-    #         "industry": "家用轻工",
-    #         "listing_date": "/OADate(44372.0)/",
-    #         "cdatetime": null
-    #     }
-    # ]
-    # cn_stock_spot_buy = fetch_api_data("cn_stock_spot_buy",date)
-    # repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_spot_buy.json())
-
-    # names = [k["name"] for k in cn_stock_spot_buy.json()]
-    # logging.info(f"names: {names}")
+    strategy_dict = {}  # 新增：记录每个股票出现在哪些策略中
 
     # 放量上涨数据
-    # [
-    # {
-    #     "date": "/OADate(45615.0)/",
-    #     "code": "605577",
-    #     "name": "\u9f99\u7248\u4f20\u5a92",
-    # }
-    # ]
     cn_stock_strategy_enter = fetch_api_data("cn_stock_strategy_enter",date)
-    repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_enter.json())
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_enter.json(), "放量上涨")
 
-    # # 均线多头数据
-    # # 格式同上
-
+    # 均线多头数据
     cn_stock_strategy_keep_increasing = fetch_api_data("cn_stock_strategy_keep_increasing",date)
-    repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_keep_increasing.json())
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_keep_increasing.json(), "均线多头")
 
-    # # 停机坪数据
-    # # 格式同上
+    # 停机坪数据
     cn_stock_strategy_parking_apron = fetch_api_data("cn_stock_strategy_parking_apron",date)
-    repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_parking_apron.json())
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_parking_apron.json(), "停机坪")
 
-    # # 回踩年线
-    # # 格式同上
+    # 回踩年线
     cn_stock_strategy_backtrace_ma250 = fetch_api_data("cn_stock_strategy_backtrace_ma250",date)
-    repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_backtrace_ma250.json())
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_backtrace_ma250.json(), "回踩年线")
 
-    # # 突破平台
-    # # 格式同上
+    # 突破平台
     cn_stock_strategy_breakthrough_platform = fetch_api_data("cn_stock_strategy_breakthrough_platform",date)
-    repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_breakthrough_platform.json())
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_breakthrough_platform.json(), "突破平台")
 
-    # # 海龟交易法
-    # # 格式同上
+    # 海龟交易法
     cn_stock_strategy_turtle_trade = fetch_api_data("cn_stock_strategy_turtle_trade",date)
-    repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_turtle_trade.json())
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_turtle_trade.json(), "海龟交易")
 
-    # # 高而窄的旗形
-    # # 格式同上
+    # 高而窄的旗形
     cn_stock_strategy_high_tight_flag = fetch_api_data("cn_stock_strategy_high_tight_flag",date)
-    repeat_stock_code(repeat_dict,repeat_name_dict, cn_stock_strategy_high_tight_flag.json())
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_high_tight_flag.json(), "高而窄的旗形")
 
     # 将repeat_dict按照出现次数排序
     repeat_dict = dict(sorted(repeat_dict.items(), key=lambda x: x[1], reverse=True))
-    # 打印出code,name,和出现次数大于2的
-    # for k,v in repeat_dict.items():
-    #     if v > 2:
-    #         logging.info(f"{k},{repeat_name_dict[k]},{v}")
-    #按照出现次数降序打印
-    for k,v in repeat_dict.items():
-        logging.info(f"{k},{repeat_name_dict[k]},{v}")
+    
+    # 打印出现次数大于2的股票信息
+    logging.info("\n=== 出现次数大于2的股票 ===")
+    logging.info("代码  名称  出现次数  推荐策略")
+    logging.info("-" * 50)
+    for code, count in repeat_dict.items():
+        if count > 2:
+            name = repeat_name_dict[code]
+            strategies = ", ".join(strategy_dict[code])
+            logging.info(f"{code}  {name}  {count}  {strategies}")
 
 def main():
     runt.run_with_args(merge_strategy_data)
