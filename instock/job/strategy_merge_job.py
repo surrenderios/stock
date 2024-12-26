@@ -112,7 +112,7 @@ def merge_strategy_data(date: str):
     logging.info("代码  名称  出现次数  推荐策略")
     logging.info("-" * 50)
     for code, count in repeat_dict.items():
-        if count > 2:
+        if count >= 2:
             name = repeat_name_dict[code]
             strategies = ", ".join(strategy_dict[code])
             logging.info(f"{code}  {name}  {count}  {strategies}")
