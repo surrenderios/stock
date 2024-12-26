@@ -58,7 +58,7 @@ def prepare(date):
         logging.error(f"indicators_data_daily_job.prepare处理异常：{e}")
 
 
-def run_check(stocks, date=None, workers=9):
+def run_check(stocks, date=None, workers=17):
     data = {}
     columns = list(tbs.STOCK_STATS_DATA['columns'])
     columns.insert(0, 'code')

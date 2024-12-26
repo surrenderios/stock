@@ -71,7 +71,7 @@ def process(table, data_all, date, backtest_column):
         logging.error(f"backtest_data_daily_job.process处理异常：{table}表{e}")
 
 
-def run_check(stocks, data_all, date, backtest_column, workers=9):
+def run_check(stocks, data_all, date, backtest_column, workers=17):
     data = {}
     try:
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:

@@ -56,7 +56,7 @@ def prepare(date):
         logging.error(f"klinepattern_data_daily_job.prepare处理异常：{e}")
 
 
-def run_check(stocks, date=None, workers=9):
+def run_check(stocks, date=None, workers=17):
     data = {}
     columns = tbs.STOCK_KLINE_PATTERN_DATA['columns']
     data_column = columns
