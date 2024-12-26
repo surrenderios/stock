@@ -61,6 +61,11 @@ def is_market_cap_gt_10000000000(total_market_cap):
     return total_market_cap > 10000000000
 
 
+# 过滤掉成交额小于2个亿的股票 deal_amount
+def is_deal_amount_gt_200000000(deal_amount):
+    return deal_amount > 200000000
+
+
 # 读取股票交易日历数据
 def fetch_stocks_trade_date():
     try:
@@ -110,7 +115,8 @@ def filter_stock_data(data, filters=None):
             'filter_a_stock': True,
             'filter_st': True,
             'filter_price': True,
-            'filter_market_cap': True
+            'filter_market_cap': True,
+            'filter_deal_amount': True
         }
 
     try:
@@ -126,7 +132,11 @@ def filter_stock_data(data, filters=None):
             
         if filters.get('filter_market_cap') and 'total_market_cap' in data.columns:
             data = data.loc[data['total_market_cap'].apply(is_market_cap_gt_10000000000)]
-            
+
+        if filters.get('filter_deal_amount') and 'deal_amount' in data.columns:
+            data = data.loc[data['deal_amount'].apply(is_deal_amount_gt_200000000)]
+
+       
         return data
     except Exception as e:
         logging.error(f"filter_stock_data处理异常：{e}")
