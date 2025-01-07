@@ -70,10 +70,10 @@ def analyze_xmas_period():
     """
     # 定义要分析的指数
     indices = {
-        # '000001': '上证指数',
-        # '000016': '上证50',
-        '000300': '沪深300',
-        # '932000': '中证2000'
+        '000001': '上证指数',
+        '000016': '上证50',
+        # '000300': '沪深300',
+        '932000': '中证2000'
     }
     
     for index_code, index_name in indices.items():
@@ -90,7 +90,7 @@ def analyze_xmas_period():
         
         xmas_data = df[
             (df['month'] == 12) & 
-            (df['day'].between(24, 31))
+            (df['day'].between(27, 31))
         ]
         
         # 按年份计算涨幅
