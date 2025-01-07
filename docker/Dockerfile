@@ -68,6 +68,8 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin \n\
 # min hour day month weekday command \n\
 */30 9,10,11,13,14,15 * * 1-5 /bin/run-parts /etc/cron.hourly \n\
 30 17 * * 1-5 /bin/run-parts /etc/cron.workdayly \n\
+30 14 * * 1-5 /bin/run-parts /etc/cron.work1430 \n\
+30 10 * * 1-5 /bin/run-parts /etc/cron.work1030 \n\
 30 10 * * 3,6 /bin/run-parts /etc/cron.monthly \n" > /var/spool/cron/crontabs/root && \
     chmod 600 /var/spool/cron/crontabs/root
 
