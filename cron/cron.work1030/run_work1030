@@ -1,0 +1,4 @@
+#!/bin/sh
+
+/usr/local/bin/python3 /data/InStock/instock/job/strategy_1030_analysis_job.py
+

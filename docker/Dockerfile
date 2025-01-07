@@ -58,11 +58,13 @@ COPY stock /data/InStock
 COPY cron/cron.hourly /etc/cron.hourly
 COPY cron/cron.workdayly /etc/cron.workdayly
 COPY cron/cron.monthly /etc/cron.monthly
+COPY cron/cron.work1430 /etc/cron.work1430
+COPY cron/cron.work1030 /etc/cron.work1030
 
 #add cron sesrvice.
 #任务调度
 RUN chmod 755 /data/InStock/instock/bin/run_*.sh && \
-    chmod 755 /etc/cron.hourly/* && chmod 755 /etc/cron.workdayly/* && chmod 755 /etc/cron.monthly/* && \
+    chmod 755 /etc/cron.hourly/* && chmod 755 /etc/cron.workdayly/* && chmod 755 /etc/cron.monthly/* && chmod 755 /etc/cron.work1430/* && chmod 755 /etc/cron.work1030/* && \
     echo "SHELL=/bin/sh \n\
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin \n\
 # min hour day month weekday command \n\
