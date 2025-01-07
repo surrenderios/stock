@@ -197,17 +197,18 @@ def merge_strategy_data(date: str):
             rise_1_probability = fetch_eastmoney_score(code)
             rise_info = str(rise_1_probability) if rise_1_probability is not None else "N/A"
             logging.info(f"{code}  {name}  {count}  {strategies}  {rise_info}  {price}")
-            
-            # 添加到输出数据
-            stock_data = {
-                "code": code,
-                "name": name,
-                "count": count,
-                "strategies": strategies,
-                "rise_probability": rise_info,
-                "price": price
-            }
-            output_data.append(stock_data)
+
+            if count >= 3 or rise_1_probability >= 50:
+                # 添加到输出数据
+                stock_data = {
+                    "code": code,
+                    "name": name,
+                    "count": count,
+                    "strategies": strategies,
+                    "rise_probability": rise_info,
+                    "price": price
+                }
+                output_data.append(stock_data)
     
     # 写入数据到文件
     output_file = write_strategy_data(output_data, date)
