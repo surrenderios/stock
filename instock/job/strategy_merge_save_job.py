@@ -151,6 +151,7 @@ def merge_strategy_data(date: str):
 
     # 放量上涨数据
     cn_stock_strategy_enter = fetch_api_data("cn_stock_strategy_enter",date)
+    logging.info("cn_stock_strategy_enter",cn_stock_strategy_enter.json())
     repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_enter.json(), "放量上涨", price_dict)
 
     # 均线多头数据
