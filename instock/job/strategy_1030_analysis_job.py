@@ -68,7 +68,7 @@ def calculate_stock_performance(stock_info: dict, current_price: float, prev_dat
     Returns:
         dict: 股票的表现数据
     """
-    prev_price = float(stock_info['new_price'])
+    prev_price = float(stock_info['price'])
     change = current_price - prev_price
     change_pct = (change / prev_price) * 100
     
