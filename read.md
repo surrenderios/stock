@@ -30,6 +30,6 @@ mayanghua/instock:202412
 2. docker run -dit --name InStock --link=InStockDbService \
 -p 9988:9988 \
 -e db_host=InStockDbService \
-mayanghua/instock:202412
+mayanghua/instock:202501
 
 

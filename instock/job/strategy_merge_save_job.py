@@ -17,7 +17,7 @@ import instock.lib.run_template as runt
 import instock.core.tablestructure as tbs
 import instock.lib.database as mdb
 from instock.core.singleton_stock import stock_hist_data
-from instock.core.stockfetch import fetch_stock_top_entity_data
+from instock.core.stockfetch import fetch_stock_top_entity_data, fetch_stocks
 
 __author__ = 'wyh'
 __date__ = '2023/3/10 '
@@ -104,7 +104,7 @@ def fetch_eastmoney_score(code: str):
         return None
 
 
-def repeat_stock_code(repeat_dict: dict, repeat_name_dict: dict, strategy_dict: dict, items: list, strategy_name: str, price_dict: dict):
+def repeat_stock_code(repeat_dict: dict, repeat_name_dict: dict, strategy_dict: dict, items: list, strategy_name: str, stock_price_map: dict, price_dict: dict):
     for k in items:
         code = k["code"]
         name = k["name"]
@@ -116,9 +116,11 @@ def repeat_stock_code(repeat_dict: dict, repeat_name_dict: dict, strategy_dict: 
             repeat_dict[code] = 1
             repeat_name_dict[code] = name
             strategy_dict[code] = [strategy_name]
-            # 保存第一次出现时的价格信息
-            if "new_price" in k:
-                price_dict[code] = k["new_price"]
+            # 从stock_price_map获取价格
+            if code in stock_price_map:
+                price_dict[code] = stock_price_map[code]
+            else:
+                price_dict[code] = "N/A"
 
 def write_strategy_data(output_data: list, date: str) -> str:
     """
@@ -143,6 +145,14 @@ def write_strategy_data(output_data: list, date: str) -> str:
     return output_file
 
 def merge_strategy_data(date: str):
+    # 获取当天所有股票的价格数据
+    stock_data = fetch_stocks(date)
+    stock_price_map = {}
+    if stock_data is not None:
+        stock_price_map = dict(zip(stock_data['code'], stock_data['new_price']))
+
+    logging.info("stock_price_map",stock_price_map)
+
     # 使用字典记录出现次数和策略名称
     repeat_dict = {}
     repeat_name_dict = {}
@@ -151,32 +161,31 @@ def merge_strategy_data(date: str):
 
     # 放量上涨数据
     cn_stock_strategy_enter = fetch_api_data("cn_stock_strategy_enter",date)
-    logging.info("cn_stock_strategy_enter",cn_stock_strategy_enter.json())
-    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_enter.json(), "放量上涨", price_dict)
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_enter.json(), "放量上涨", stock_price_map, price_dict)
 
     # 均线多头数据
     cn_stock_strategy_keep_increasing = fetch_api_data("cn_stock_strategy_keep_increasing",date)
-    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_keep_increasing.json(), "均线多头", price_dict)
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_keep_increasing.json(), "均线多头", stock_price_map, price_dict)
 
     # 停机坪数据
     cn_stock_strategy_parking_apron = fetch_api_data("cn_stock_strategy_parking_apron",date)
-    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_parking_apron.json(), "停机坪", price_dict)
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_parking_apron.json(), "停机坪", stock_price_map, price_dict)
 
     # 回踩年线
     cn_stock_strategy_backtrace_ma250 = fetch_api_data("cn_stock_strategy_backtrace_ma250",date)
-    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_backtrace_ma250.json(), "回踩年线", price_dict)
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_backtrace_ma250.json(), "回踩年线", stock_price_map, price_dict)
 
     # 突破平台
     cn_stock_strategy_breakthrough_platform = fetch_api_data("cn_stock_strategy_breakthrough_platform",date)
-    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_breakthrough_platform.json(), "突破平台", price_dict)
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_breakthrough_platform.json(), "突破平台", stock_price_map, price_dict)
 
     # 海龟交易法
     cn_stock_strategy_turtle_trade = fetch_api_data("cn_stock_strategy_turtle_trade",date)
-    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_turtle_trade.json(), "海龟交易", price_dict)
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_turtle_trade.json(), "海龟交易", stock_price_map, price_dict)
 
     # 高而窄的旗形
     cn_stock_strategy_high_tight_flag = fetch_api_data("cn_stock_strategy_high_tight_flag",date)
-    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_high_tight_flag.json(), "高而窄的旗形", price_dict)
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_high_tight_flag.json(), "高而窄的旗形", stock_price_map, price_dict)
 
     # 将repeat_dict按照出现次数排序
     repeat_dict = dict(sorted(repeat_dict.items(), key=lambda x: x[1], reverse=True))
