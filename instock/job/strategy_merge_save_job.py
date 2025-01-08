@@ -117,8 +117,8 @@ def repeat_stock_code(repeat_dict: dict, repeat_name_dict: dict, strategy_dict: 
             repeat_name_dict[code] = name
             strategy_dict[code] = [strategy_name]
             # 保存第一次出现时的价格信息
-            if "price" in k:
-                price_dict[code] = k["price"]
+            if "new_price" in k:
+                price_dict[code] = k["new_price"]
 
 def write_strategy_data(output_data: list, date: str) -> str:
     """
@@ -206,7 +206,7 @@ def merge_strategy_data(date: str):
                     "count": count,
                     "strategies": strategies,
                     "rise_probability": rise_info,
-                    "price": price
+                    "new_price": price
                 }
                 output_data.append(stock_data)
     
