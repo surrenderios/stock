@@ -7,6 +7,7 @@ import pandas as pd
 import os.path
 import sys
 import requests
+import json
 
 cpath_current = os.path.dirname(os.path.dirname(__file__))
 cpath = os.path.abspath(os.path.join(cpath_current, os.pardir))
@@ -102,7 +103,7 @@ def fetch_eastmoney_score(code: str):
         return None
 
 
-def repeat_stock_code(repeat_dict: dict, repeat_name_dict: dict, strategy_dict: dict, items: list, strategy_name: str):
+def repeat_stock_code(repeat_dict: dict, repeat_name_dict: dict, strategy_dict: dict, items: list, strategy_name: str, price_dict: dict):
     for k in items:
         code = k["code"]
         name = k["name"]
@@ -114,57 +115,87 @@ def repeat_stock_code(repeat_dict: dict, repeat_name_dict: dict, strategy_dict: 
             repeat_dict[code] = 1
             repeat_name_dict[code] = name
             strategy_dict[code] = [strategy_name]
+            # 保存第一次出现时的价格信息
+            if "new_price" in k:
+                price_dict[code] = k["new_price"]
 
 def merge_strategy_data(date: str):
     # 使用字典记录出现次数和策略名称
     repeat_dict = {}
     repeat_name_dict = {}
     strategy_dict = {}  # 新增：记录每个股票出现在哪些策略中
+    price_dict = {}    # 新增：记录每个股票的价格
 
     # 放量上涨数据
     cn_stock_strategy_enter = fetch_api_data("cn_stock_strategy_enter",date)
-    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_enter.json(), "放量上涨")
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_enter.json(), "放量上涨", price_dict)
 
     # 均线多头数据
     cn_stock_strategy_keep_increasing = fetch_api_data("cn_stock_strategy_keep_increasing",date)
-    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_keep_increasing.json(), "均线多头")
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_keep_increasing.json(), "均线多头", price_dict)
 
     # 停机坪数据
     cn_stock_strategy_parking_apron = fetch_api_data("cn_stock_strategy_parking_apron",date)
-    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_parking_apron.json(), "停机坪")
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_parking_apron.json(), "停机坪", price_dict)
 
     # 回踩年线
     cn_stock_strategy_backtrace_ma250 = fetch_api_data("cn_stock_strategy_backtrace_ma250",date)
-    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_backtrace_ma250.json(), "回踩年线")
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_backtrace_ma250.json(), "回踩年线", price_dict)
 
     # 突破平台
     cn_stock_strategy_breakthrough_platform = fetch_api_data("cn_stock_strategy_breakthrough_platform",date)
-    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_breakthrough_platform.json(), "突破平台")
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_breakthrough_platform.json(), "突破平台", price_dict)
 
     # 海龟交易法
     cn_stock_strategy_turtle_trade = fetch_api_data("cn_stock_strategy_turtle_trade",date)
-    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_turtle_trade.json(), "海龟交易")
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_turtle_trade.json(), "海龟交易", price_dict)
 
     # 高而窄的旗形
     cn_stock_strategy_high_tight_flag = fetch_api_data("cn_stock_strategy_high_tight_flag",date)
-    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_high_tight_flag.json(), "高而窄的旗形")
+    repeat_stock_code(repeat_dict, repeat_name_dict, strategy_dict, cn_stock_strategy_high_tight_flag.json(), "高而窄的旗形", price_dict)
 
     # 将repeat_dict按照出现次数排序
     repeat_dict = dict(sorted(repeat_dict.items(), key=lambda x: x[1], reverse=True))
     
-    # 打印出现次数大于2的股票信息
+    # 创建日期文件夹
+    output_dir = os.path.join(cpath_current, "data", "strategy", date)
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # 准备要写入文件的数据
+    output_data = []
+    
+    # 打印出现次数2次以上的股票信息
     logging.info("\n=== 出现次数2次以上的股票 ===")
-    logging.info("代码  名称  出现次数  推荐策略  东方财富统计次日上涨概率")
-    logging.info("-" * 50)
+    logging.info("代码  名称  出现次数  推荐策略  东方财富统计次日上涨概率  当前价格")
+    logging.info("-" * 60)
     for code, count in repeat_dict.items():
         if count >= 2:
             name = repeat_name_dict[code]
             strategies = ", ".join(strategy_dict[code])
+            price = price_dict.get(code, "N/A")
 
             # 获取次日上涨概率
             rise_1_probability = fetch_eastmoney_score(code)
             rise_info = str(rise_1_probability) if rise_1_probability is not None else "N/A"
-            logging.info(f"{code}  {name}  {count}  {strategies}  {rise_info}")
+            logging.info(f"{code}  {name}  {count}  {strategies}  {rise_info}  {price}")
+            
+            # 添加到输出数据
+            stock_data = {
+                "code": code,
+                "name": name,
+                "count": count,
+                "strategies": strategies,
+                "rise_probability": rise_info,
+                "new_price": price
+            }
+            output_data.append(stock_data)
+    
+    # 将数据写入到日期文件夹下的JSON文件
+    output_file = os.path.join(output_dir, "recommended_stocks.json")
+    with open(output_file, 'w', encoding='utf-8') as f:
+        json.dump(output_data, f, ensure_ascii=False, indent=2)
+    
+    logging.info(f"\n推荐股票数据已写入到: {output_file}")
 
 def main():
     runt.run_with_args(merge_strategy_data)
