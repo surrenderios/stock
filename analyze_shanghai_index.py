@@ -5,6 +5,7 @@ import pandas as pd
 import requests
 from datetime import datetime
 import logging
+import numpy as np
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -62,95 +63,82 @@ def fetch_sh_index_hist(start_date, end_date, index_code='000001'):
         logging.error(f"Error fetching data for index {index_code}: {str(e)}")
         return pd.DataFrame()
 
-def analyze_xmas_period():
+def calculate_future_changes(df, high_change_dates):
     """
-    分析2010-2023年间圣诞节前后各指数涨幅
-    基准日：12.24（如果不是交易日则往后推到最近的交易日）
-    结束日：12.28（如果不是交易日则往后推到最近的交易日）
+    计算大涨日后续的涨跌幅
     """
-    # 定义要分析的指数
-    indices = {
-        '000001': '上证指数',
-        '000016': '上证50',
-        # '000300': '沪深300',
-        '932000': '中证2000'
-    }
+    future_changes = []
     
-    for index_code, index_name in indices.items():
-        # 获取2010-2023年的数据
-        df = fetch_sh_index_hist('20101201', '20240105', index_code)
-        if df.empty:
-            logging.error(f"Failed to fetch data for {index_name}")
-            continue
+    for date in high_change_dates:
+        date_idx = df[df['date'] == pd.to_datetime(date)].index[0]
+        
+        # 计算后1天涨跌幅
+        next_1d_change = np.nan
+        if date_idx + 1 < len(df):
+            next_1d_change = df.iloc[date_idx + 1]['change_pct']
             
-        # 筛选12月24-31日的数据（扩大范围以处理节假日）
-        df['month'] = df['date'].dt.month
-        df['day'] = df['date'].dt.day
-        df['year'] = df['date'].dt.year
-        
-        xmas_data = df[
-            (df['month'] == 12) & 
-            (df['day'].between(27, 31))
-        ]
-        
-        # 按年份计算涨幅
-        yearly_stats = []
-        for year in range(2010, 2024):
-            year_data = xmas_data[xmas_data['year'] == year].copy()
-            if not year_data.empty:
-                try:
-                    # 找到12.24后的第一个交易日（包括12.24）
-                    base_data = year_data[year_data['day'] >= 24].sort_values('date').iloc[0]
-                    base_date = base_data['date']
-                    price_base = base_data['close']
-                    
-                    # 找到12.28后的第一个交易日（包括12.28）
-                    end_data = year_data[year_data['day'] >= 28].sort_values('date').iloc[0]
-                    end_date = end_data['date']
-                    price_end = end_data['close']
-                    
-                    # 计算涨跌幅
-                    change_pct = round((price_end - price_base) / price_base * 100, 2)
-                    
-                    yearly_stats.append({
-                        'year': year,
-                        'total_change_pct': change_pct,
-                        'price_base': price_base,
-                        'price_end': price_end,
-                        'base_date': base_date.strftime('%Y-%m-%d'),
-                        'end_date': end_date.strftime('%Y-%m-%d')
-                    })
-                except IndexError:
-                    logging.warning(f"{year}年{index_name}数据不完整，跳过")
-                    continue
-        
-        # 打印结果
-        print(f"\n{index_name}圣诞节前后涨幅统计(2010-2023)：")
-        print("-" * 110)
-        print(f"{'年份':<6} {'基准日期':<12} {'基准收盘':<10} {'结束日期':<12} {'结束收盘':<10} {'涨跌幅%':<8}")
-        print("-" * 110)
-        
-        for stat in yearly_stats:
-            print(f"{stat['year']:<6} {stat['base_date']:<12} {stat['price_base']:<10.2f} "
-                  f"{stat['end_date']:<12} {stat['price_end']:<10.2f} {stat['total_change_pct']:>6.2f}%")
-        
-        # 计算统计信息
-        changes = [stat['total_change_pct'] for stat in yearly_stats]
-        if changes:
-            avg_change = sum(changes) / len(changes)
-            positive_years = sum(1 for c in changes if c > 0)
-            print("-" * 110)
-            print(f"平均涨幅: {avg_change:.2f}%")
-            print(f"上涨年数: {positive_years}/{len(changes)} ({positive_years/len(changes)*100:.1f}%)")
+        # 计算后3天累计涨跌幅
+        next_3d_change = np.nan
+        if date_idx + 3 < len(df):
+            next_3d_change = df.iloc[date_idx + 1:date_idx + 4]['change_pct'].sum()
             
-            # 计算最大涨幅和最大跌幅
-            max_up = max(changes)
-            max_down = min(changes)
-            max_up_year = next(stat['year'] for stat in yearly_stats if stat['total_change_pct'] == max_up)
-            max_down_year = next(stat['year'] for stat in yearly_stats if stat['total_change_pct'] == max_down)
-            print(f"最大涨幅: {max_up:.2f}% ({max_up_year}年)")
-            print(f"最大跌幅: {max_down:.2f}% ({max_down_year}年)")
-        print("\n" + "=" * 110)  # 添加分隔线
+        future_changes.append({
+            'date': date,
+            'change_pct': df.iloc[date_idx]['change_pct'],
+            'next_1d_change': next_1d_change,
+            'next_3d_change': next_3d_change
+        })
+    
+    return pd.DataFrame(future_changes)
+
+def get_high_change_dates(start_date, end_date, threshold=2.0):
+    """
+    获取指定时间段内上证指数涨幅超过阈值的日期（只统计上涨）及其后续表现
+    :param start_date: 开始日期，格式：YYYYMMDD
+    :param end_date: 结束日期，格式：YYYYMMDD
+    :param threshold: 涨幅阈值，默认2.0%
+    :return: DataFrame包含日期、涨幅及后续表现
+    """
+    # 获取上证指数数据
+    df = fetch_sh_index_hist(start_date, end_date)
+    
+    if df.empty:
+        logging.error("Failed to fetch Shanghai index data")
+        return pd.DataFrame()
+    
+    # 筛选涨幅超过阈值的日期（只要上涨的）
+    high_change_df = df[df['change_pct'] >= threshold].copy()
+    
+    # 按日期排序
+    high_change_df = high_change_df.sort_values('date')
+    high_change_dates = high_change_df['date'].dt.strftime('%Y-%m-%d').tolist()
+    
+    # 计算后续涨跌幅
+    result_df = calculate_future_changes(df, high_change_dates)
+    
+    # 格式化列名
+    result_df.columns = ['日期', '涨幅(%)', '次日涨跌幅(%)', '后3日累计涨跌幅(%)']
+    
+    return result_df
 
 if __name__ == "__main__":
-    analyze_xmas_period() 
+    # 示例：获取2023年至今涨幅超过2%的日期
+    start_date = "20220101"
+    end_date = datetime.now().strftime("%Y%m%d")
+    
+    result_df = get_high_change_dates(start_date, end_date)
+    if not result_df.empty:
+        print("\n上证指数涨幅超过2%的日期及后续表现：")
+        print("-" * 70)
+        pd.set_option('display.float_format', '{:.2f}'.format)
+        print(result_df.to_string(index=False))
+        
+        # 统计后续表现
+        print("\n统计分析：")
+        print("-" * 70)
+        print(f"大涨日次日上涨概率: {(result_df['次日涨跌幅(%)'] > 0).mean():.2%}")
+        print(f"大涨日后3日上涨概率: {(result_df['后3日累计涨跌幅(%)'] > 0).mean():.2%}")
+        print(f"次日平均涨跌幅: {result_df['次日涨跌幅(%)'].mean():.2f}%")
+        print(f"后3日平均涨跌幅: {result_df['后3日累计涨跌幅(%)'].mean():.2f}%")
+    else:
+        print("未获取到数据或指定时间段内没有符合条件的数据") 
