@@ -56,14 +56,14 @@ def is_open(price):
 def is_open_with_line(price):
     return price != '-'
 
-# 过滤掉市值小于100亿的股票 total_market_cap
-def is_market_cap_gt_10000000000(total_market_cap):
-    return total_market_cap > 10000000000
+# 过滤掉市值小于指定值的股票
+def is_market_cap_greater_than(total_market_cap, min_market_cap):
+    return total_market_cap > min_market_cap
 
 
-# 过滤掉成交额小于2个亿的股票 deal_amount
-def is_deal_amount_gt_200000000(deal_amount):
-    return deal_amount > 200000000
+# 过滤掉成交额小于指定值的股票
+def is_deal_amount_greater_than(deal_amount, min_deal_amount):
+    return deal_amount > min_deal_amount
 
 
 # 读取股票交易日历数据
@@ -131,12 +131,11 @@ def filter_stock_data(data, filters=None):
             data = data.loc[data['name'].apply(is_not_st)]
             
         if filters.get('filter_market_cap') and 'total_market_cap' in data.columns:
-            data = data.loc[data['total_market_cap'].apply(is_market_cap_gt_10000000000)]
-
+            # 过滤掉市值小于50亿的股票
+            data = data.loc[data['total_market_cap'].apply(is_market_cap_greater_than, args=(5000000000,))]
         if filters.get('filter_deal_amount') and 'deal_amount' in data.columns:
-            data = data.loc[data['deal_amount'].apply(is_deal_amount_gt_200000000)]
-
-       
+            # 过滤掉成交额小于2个亿的股票
+            data = data.loc[data['deal_amount'].apply(is_deal_amount_greater_than, args=(200000000,))]
         return data
     except Exception as e:
         logging.error(f"filter_stock_data处理异常：{e}")
