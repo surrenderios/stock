@@ -114,6 +114,17 @@ def main():
 
     logging.info("######## 完成所有任务, 总耗时: %.2f 秒 #######" % (time.time() - start))
 
+    # 完成以后,将日志读取发送到邮件
+    content = open(os.path.join(log_path, 'stock_execute_job.log'), 'r').read()
+
+    sender_email = "315828917@qq.com"  # 替换为你的QQ邮箱
+    auth_code = "bmvtnrtkibpjbhdi"  # 替换为你的QQ邮箱授权码
+    
+    mail_sender = QQMailSender(sender_email, auth_code)
+    to_user = "surrenderios@gmail.com"  # 替换为接收者的邮箱
+    success, message = mail_sender.send_mail(content, to_user)
+
+
 # main函数入口
 if __name__ == '__main__':
     main()
