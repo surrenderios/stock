@@ -1,8 +1,8 @@
 # 基础镜像
 # https://hub.docker.com/_/python/tags?page=1&name=3.11-slim-bullseye
-FROM docker.io/python:3.11-slim-bullseye
+FROM python:3.11-slim-bullseye
 
-MAINTAINER myh
+LABEL maintainer="myh"
 #增加语言utf-8
 ENV LANG=zh_CN.UTF-8
 ENV LC_CTYPE=zh_CN.UTF-8

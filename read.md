@@ -1,8 +1,18 @@
 
 # 配置
-python3.11 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install python3.11
+
+# 安装 Python 3.11 的 distutils 模块
+sudo apt install python3.11-distutils
+
+# 安装 ensurepip 所需的工具
+sudo apt install python3.11-venv
+
+python3.11 -m venv myenv
+source myenv/bin/activate
 
 # 系统
 ubuntu 22.04
